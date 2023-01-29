@@ -33,30 +33,31 @@
         <div class="row">
             <div class="col-12 col-md-4 col-lg-3">
             <h3>Search for a City:</h3>
-            <input class="form-control mt-2 mb-2" placeholder="Type to search...">
+            <form id ="user-form">
+            <input id="city" class="form-control mt-2 mb-2" placeholder="Type to search...">
             <div class="d-grid gap-2">
-                <button class="btn btn-primary" type="button">Search</button>
+            <button class="btn btn-primary" type="submit">Search</button>
               </div>
+            </form> 
 
               <hr />
 
-              <div class="d-grid gap-2 mt-2 mb-2">
-                <button class="btn btn-secondary" type="button">Atlanta</button>
-                <button class="btn btn-secondary" type="button">Denver</button>
-                <button class="btn btn-secondary" type="button">Seattle</button>
-                <button class="btn btn-secondary" type="button">San Francisco</button>
-                <button class="btn btn-secondary" type="button">Orlando</button>
-                <button class="btn btn-secondary" type="button">New York</button>
-                <button class="btn btn-secondary" type="button">Chicago</button>
-                <button class="btn btn-secondary" type="button">Austin</button>
+              <div id="city-buttons" class="d-grid gap-2 mt-2 mb-2">
+                <button data-city ="Atlanta" class="btn btn-secondary" type="button">Atlanta</button>
+                <button data-city ="Denver" class="btn btn-secondary" type="button">Denver</button>
+                <button data-city ="Seattle" class="btn btn-secondary" type="button">Seattle</button>
+                <button data-city ="San Francisco" class="btn btn-secondary" type="button">San Francisco</button>
+                <button data-city ="Orlando" class="btn btn-secondary" type="button">Orlando</button>
+                <button data-city ="New York" class="btn btn-secondary" type="button">New York</button>
+                <button data-city ="Chicago" class="btn btn-secondary" type="button">Chicago</button>
+                <button data-city ="Austin" class="btn btn-secondary" type="button">Austin</button>
               </div>
             </div>
     
           <div class="col-12 col-md-8 col-lg-9">           
             <div class="card me-1 mt-2 mb-2">
-                <div class="card-body">
-                    <h3>main</h3>
-                  This is some text within a card body.
+                <div id="weather-container" class="card-body">
+
                 </div>
               </div>
 
@@ -65,41 +66,46 @@
                 <h2>5-Day Forecast:</h1>
               <div class="card" style="width: 12rem;">
                 <div class="card-body">
-                  <h5 class="card-title">Card title</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <h5 class="date"></h5>
+                  <p class ="temp"></p>
+                  <p class ="wind"></p>
+                  <p class ="humidity"></p>
                 </div>
               </div>
 
               <div class="card" style="width: 12rem;">
                 <div class="card-body">
-                  <h5 class="card-title">Card title</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <h5 class="date"></h5>
+                  <p class ="temp"></p>
+                  <p class ="wind"></p>
+                  <p class ="humidity"></p>
                 </div>
               </div>
             
               <div class="card" style="width: 12rem;">
                 <div class="card-body">
-                  <h5 class="card-title">Card title</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <h5 class="date"></h5>
+                  <p class ="temp"></p>
+                  <p class ="wind"></p>
+                  <p class ="humidity"></p>
                 </div>
               </div>
 
               <div class="card" style="width: 12rem;">
                 <div class="card-body">
-                  <h5 class="card-title">Card title</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <h5 class="date"></h5>
+                  <p class ="temp"></p>
+                  <p class ="wind"></p>
+                  <p class ="humidity"></p>
                 </div>
               </div>
 
               <div class="card" style="width: 12rem;">
                 <div class="card-body">
-                  <h5 class="card-title">Card title</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <h5 class="date"></h5>
+                  <p class ="temp"></p>
+                  <p class ="wind"></p>
+                  <p class ="humidity"></p>
                 </div>
               </div>
 
