@@ -4,7 +4,7 @@ var userFormEl = document.querySelector('#user-form');
 var historyButtonsEl = document.querySelector('#history-buttons');
 var cityInputEl = document.querySelector('#city');
 var todayWeather = document.querySelector('#today-weather');
-
+var forecastContent = document.querySelector('#forecast-content');
 
 var formSubmitHandler = function (event) {
   event.preventDefault();
@@ -20,7 +20,6 @@ var formSubmitHandler = function (event) {
     alert('Please enter a City');
   }
 };
-
 
 var getLocation = function (city) {
   var locationUrl = "http://api.openweathermap.org/geo/1.0/direct?q=" + city + "&appid=" + APIKey;
@@ -40,7 +39,6 @@ if (city) {
           localStorage.setItem('lat', JSON.stringify(lat));
           localStorage.setItem('lon', JSON.stringify(lon));
           getWeather();
-          displayCity();
           saveHistory();
         });
       } else {
@@ -56,25 +54,40 @@ var getWeather = function (lat, lon) {
   lat = localStorage.getItem('lat');
   lon = localStorage.getItem('lon');
   var weatherUrl =  'http://api.openweathermap.org/data/2.5/forecast?lat=' + lat + '&lon=' + lon + "&units=metric&appid=" + APIKey;
-   
+ 
   fetch(weatherUrl)
   .then(function (response) {
     if (response.ok) {
       response.json().then(function (data) {
 
+          var temp = [];
+          var wind = [];
+          var humidity = [];
+
+        for (let i = 0; i < 7; i++){
         console.log(data);
-        var temp = data.list[0].main.temp;
-        console.log(temp);
-        var wind = data.list[0].wind.speed;
-        console.log(wind);
-        var humidity = data.list[0].main.humidity;
-        console.log(humidity);
-      
-        localStorage.setItem('temp', temp);
-        localStorage.setItem('wind', wind);
-        localStorage.setItem('humidity', humidity);
-       
+
+        date = data.list[i].dt_txt;
+        console.log(date);
+
+        tempData = data.list[i].main.temp;
+        console.log(tempData);
+        temp.push(tempData);
+        localStorage.setItem('temp', JSON.stringify(temp));
+
+        windData = data.list[i].wind.speed;
+        console.log(windData);
+        wind.push(windData);
+        localStorage.setItem('wind', JSON.stringify(wind));
+
+        humidityData = data.list[i].main.humidity;
+        console.log(humidityData);
+        humidity.push(humidityData);
+        localStorage.setItem('humidity', JSON.stringify(humidity));
+   
+        }
         displayWeather();
+        displayForecast();
       });
     } else {
       alert('Error: ' + response.statusText);
@@ -86,7 +99,6 @@ var getWeather = function (lat, lon) {
 };  
 }
 
-
 var saveHistory = function(history) {
   var history = localStorage.getItem('location');
   var cityButton = document.createElement('button');
@@ -94,7 +106,7 @@ var saveHistory = function(history) {
 
   cityButton.setAttribute('value', value = history);
   cityButton.appendChild(buttonText);
-  console.log(cityButton.value);
+  cityButton.classList.add('btn', 'btn-secondary')
 
   historyButtonsEl.appendChild(cityButton);
 
@@ -107,36 +119,73 @@ var buttonClickHandler = function (event) {
   todayWeather.textContent = '';
 };
 
-var displayCity = function (location) {
-  var location = localStorage.getItem('location');
-
-  var cityEl = document.createElement('h3');
-  cityEl.textContent = location;
-
-  todayWeather.appendChild(cityEl);
-
-}
 
 var displayWeather = function() {
-  
-  var temp = localStorage.getItem('temp');
-  var wind = localStorage.getItem('wind');
-  var humidity = localStorage.getItem('humidity');
+  var location = localStorage.getItem('location');
+  var temp = JSON.parse(localStorage.getItem('temp'));
+  var wind = JSON.parse(localStorage.getItem('wind'));
+  var humidity = JSON.parse(localStorage.getItem('humidity'));
 
-  var tempEl = document.createElement('p');
-  var windEl = document.createElement('p');
-  var humidityEl = document.createElement('p');
+    var weatherCard = document.createElement('div');
+    weatherCard.classList.add('card', 'width-12rem');
 
-  tempEl.innerHTML = "Temp: " + temp + "°C";
-  windEl.innerHTML = "Wind: " + wind + "m/s";
-  humidityEl.innerHTML = "Humidity: " + humidity + "%";
+    var cardBody = document.createElement('div');
+    cardBody.classList.add('card-body');
+    weatherCard.append(cardBody);
 
-  todayWeather.appendChild(tempEl);
-  todayWeather.appendChild(windEl);
-  todayWeather.appendChild(humidityEl);
+    var cityEl = document.createElement('h3');
+    cityEl.textContent = location;   
+
+    var bodyContentEl = document.createElement('p');
+    bodyContentEl.innerHTML =
+      '<strong>Temp:</strong> ' + temp[0] + ' °C<br/>';
+
+    bodyContentEl.innerHTML +=
+      '<strong>Wind:</strong> ' + wind[0] + ' m/s<br/>';
+
+      bodyContentEl.innerHTML +=
+      '<strong>Humidity:</strong> ' + humidity[0] + ' %<br/>';
+
+      cardBody.append(cityEl, bodyContentEl);
+
+      todayWeather.append(weatherCard);
 
 }
 
+var displayForecast = function() {
+  var temp = JSON.parse(localStorage.getItem('temp')) || [];
+  var wind = JSON.parse(localStorage.getItem('wind')) || [];
+  var humidity = JSON.parse(localStorage.getItem('humidity')) || [];
+
+  var titleEl = document.createElement('h2');
+  titleEl.textContent = "5-Day Forecast:";  
+
+  forecastContent.append(titleEl);
+
+  for (let i =1; i < 6; i++) {
+
+    var weatherCard = document.createElement('div');
+    weatherCard.classList.add('card', 'bg-dark', 'text-light', 'mb-3', 'p-2', 'width-12rem');
+
+    var cardBody = document.createElement('div');
+    cardBody.classList.add('card-body');
+    weatherCard.append(cardBody);
+
+    var bodyContentEl = document.createElement('p');
+    bodyContentEl.innerHTML =
+      '<strong>Temp:</strong> ' + temp[i] + ' °C<br/>';
+
+    bodyContentEl.innerHTML +=
+      '<strong>Wind:</strong> ' + wind[i] + ' m/s<br/>';
+
+      bodyContentEl.innerHTML +=
+      '<strong>Humidity:</strong> ' + humidity[i] + ' %<br/>';
+
+      cardBody.append(bodyContentEl);
+
+      forecastContent.append(weatherCard);
+  }
+}
 
 userFormEl.addEventListener('submit', formSubmitHandler);
 historyButtonsEl.addEventListener('click', buttonClickHandler);
