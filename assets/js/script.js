@@ -5,14 +5,23 @@ var historyButtonsEl = document.querySelector('#history-buttons');
 var cityInputEl = document.querySelector('#city');
 var todayWeather = document.querySelector('#today-weather');
 var forecastContent = document.querySelector('#forecast-content');
+var forecastTitle = document.querySelector('#forecast-title');
+
+var saveCity = function(location) {
+  var previousSaveHistory = JSON.parse(localStorage.getItem('save-history')) || [];
+  previousSaveHistory.push(location);
+  localStorage.setItem('save-history', JSON.stringify(previousSaveHistory));
+};
 
 var formSubmitHandler = function (event) {
   event.preventDefault();
 
   var city = cityInputEl.value.trim();
+  
 
   if (city) {
     getLocation(city);
+    saveCity(city);
 
     todayWeather.textContent = '';
     cityInputEl.value = '';
@@ -20,6 +29,7 @@ var formSubmitHandler = function (event) {
     alert('Please enter a City');
   }
 };
+
 
 var getLocation = function (city) {
   var locationUrl = "http://api.openweathermap.org/geo/1.0/direct?q=" + city + "&appid=" + APIKey;
@@ -35,9 +45,10 @@ if (city) {
           location = data[0].name;
           lat = data[0].lat;
           lon = data[0].lon;
-          localStorage.setItem('location', location);
-          localStorage.setItem('lat', JSON.stringify(lat));
-          localStorage.setItem('lon', JSON.stringify(lon));
+          localStorage.setItem('location', location)
+          localStorage.setItem('lat', lat);
+          localStorage.setItem('lon', lon);
+          getCurrentWeather();
           getWeather();
           saveHistory();
         });
@@ -50,6 +61,68 @@ if (city) {
     });
   }
    
+var getCurrentWeather = function (lat, lon) {
+  lat = localStorage.getItem('lat');
+  lon = localStorage.getItem('lon');
+  var weatherUrl = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&units=metric&appid=" + APIKey;
+  
+  fetch(weatherUrl)
+  .then(function (response) {
+    if (response.ok) {
+      response.json().then(function (data) {
+        console.log("current", data);
+
+        date = data.dt_txt;
+        var today = dayjs(date).format('DD / MM / YY'); 
+        
+        var location = localStorage.getItem('location');
+
+          var temp = data.main.temp;
+          console.log('current temp', temp);
+        var wind = data.wind.speed;
+        var humidity = data.main.humidity;
+      
+        var weatherCard = document.createElement('div');
+        weatherCard.classList.add('card', 'width-12rem');
+      
+        var cardBody = document.createElement('div');
+        cardBody.classList.add('card-body');
+        weatherCard.append(cardBody);
+      
+        var cityEl = document.createElement('h3');
+        cityEl.textContent = location;   
+      
+        var dateEl = document.createElement('h3');
+        dateEl.textContent = today;
+      
+        var iconEl = document.createElement('i');
+      
+        if (temp[0] > 20) {
+          iconEl.classList.add("fa-solid", "fa-sun");
+        }
+        else {
+          iconEl.classList.add("fa-solid", "fa-cloud");
+        }
+      
+        var bodyContentEl = document.createElement('p');
+        bodyContentEl.innerHTML =
+          '<strong>Temp:</strong> ' + temp + ' °C<br/>';
+      
+        bodyContentEl.innerHTML +=
+          '<strong>Wind:</strong> ' + wind + ' m/s<br/>';
+      
+        bodyContentEl.innerHTML +=
+          '<strong>Humidity:</strong> ' + humidity + ' %<br/>';
+      
+        cardBody.append(cityEl, dateEl, iconEl, bodyContentEl);
+      
+        todayWeather.append(weatherCard);
+
+      })
+    }
+  })
+};
+
 var getWeather = function (lat, lon) {
   lat = localStorage.getItem('lat');
   lon = localStorage.getItem('lon');
@@ -60,33 +133,37 @@ var getWeather = function (lat, lon) {
     if (response.ok) {
       response.json().then(function (data) {
 
+          var date = [];
           var temp = [];
           var wind = [];
           var humidity = [];
 
-        for (let i = 0; i < 7; i++){
+        for (let i = 0; i < data.list.length; i++){
         console.log(data);
 
-        date = data.list[i].dt_txt;
-        console.log(date);
+        dateData = data.list[i].dt_txt;
 
-        tempData = data.list[i].main.temp;
-        console.log(tempData);
-        temp.push(tempData);
-        localStorage.setItem('temp', JSON.stringify(temp));
+          if (dateData.endsWith("12:00:00")) {
+      
+          date.push(dateData);
+          localStorage.setItem('date', JSON.stringify(date));
 
-        windData = data.list[i].wind.speed;
-        console.log(windData);
-        wind.push(windData);
-        localStorage.setItem('wind', JSON.stringify(wind));
+          tempData = data.list[i].main.temp;
+          console.log(tempData);
+          temp.push(tempData);
+          localStorage.setItem('temp', JSON.stringify(temp));
 
-        humidityData = data.list[i].main.humidity;
-        console.log(humidityData);
-        humidity.push(humidityData);
-        localStorage.setItem('humidity', JSON.stringify(humidity));
-   
+          windData = data.list[i].wind.speed;
+          console.log(windData);
+          wind.push(windData);
+          localStorage.setItem('wind', JSON.stringify(wind));
+
+          humidityData = data.list[i].main.humidity;
+          console.log(humidityData);
+          humidity.push(humidityData);
+          localStorage.setItem('humidity', JSON.stringify(humidity));
+          }
         }
-        displayWeather();
         displayForecast();
       });
     } else {
@@ -99,17 +176,22 @@ var getWeather = function (lat, lon) {
 };  
 }
 
-var saveHistory = function(history) {
-  var history = localStorage.getItem('location');
+var saveHistory = function() {
+  var history = JSON.parse(localStorage.getItem('save-history'));
+  historyButtonsEl.textContent = "";
+  for (let i = 0; i < history.length; i++) {
+    const cityName = history[i];
+    
+  
   var cityButton = document.createElement('button');
-  var buttonText = document.createTextNode(history);
+  var buttonText = document.createTextNode(cityName);
 
-  cityButton.setAttribute('value', value = history);
+  cityButton.setAttribute('value', value = cityName);
   cityButton.appendChild(buttonText);
   cityButton.classList.add('btn', 'btn-secondary')
 
   historyButtonsEl.appendChild(cityButton);
-
+}
 }
 
 var buttonClickHandler = function (event) {
@@ -119,50 +201,19 @@ var buttonClickHandler = function (event) {
   todayWeather.textContent = '';
 };
 
-
-var displayWeather = function() {
-  var location = localStorage.getItem('location');
-  var temp = JSON.parse(localStorage.getItem('temp'));
-  var wind = JSON.parse(localStorage.getItem('wind'));
-  var humidity = JSON.parse(localStorage.getItem('humidity'));
-
-    var weatherCard = document.createElement('div');
-    weatherCard.classList.add('card', 'width-12rem');
-
-    var cardBody = document.createElement('div');
-    cardBody.classList.add('card-body');
-    weatherCard.append(cardBody);
-
-    var cityEl = document.createElement('h3');
-    cityEl.textContent = location;   
-
-    var bodyContentEl = document.createElement('p');
-    bodyContentEl.innerHTML =
-      '<strong>Temp:</strong> ' + temp[0] + ' °C<br/>';
-
-    bodyContentEl.innerHTML +=
-      '<strong>Wind:</strong> ' + wind[0] + ' m/s<br/>';
-
-      bodyContentEl.innerHTML +=
-      '<strong>Humidity:</strong> ' + humidity[0] + ' %<br/>';
-
-      cardBody.append(cityEl, bodyContentEl);
-
-      todayWeather.append(weatherCard);
-
-}
-
 var displayForecast = function() {
   var temp = JSON.parse(localStorage.getItem('temp')) || [];
   var wind = JSON.parse(localStorage.getItem('wind')) || [];
   var humidity = JSON.parse(localStorage.getItem('humidity')) || [];
+  var date = JSON.parse(localStorage.getItem('date')) || [];
 
   var titleEl = document.createElement('h2');
   titleEl.textContent = "5-Day Forecast:";  
+  forecastContent.textContent = "";
+  forecastTitle.textContent = "";
+  forecastTitle.appendChild(titleEl);
 
-  forecastContent.append(titleEl);
-
-  for (let i =1; i < 6; i++) {
+  for (let i = 0; i < 5; i++) {
 
     var weatherCard = document.createElement('div');
     weatherCard.classList.add('card', 'bg-dark', 'text-light', 'mb-3', 'p-2', 'width-12rem');
@@ -170,7 +221,20 @@ var displayForecast = function() {
     var cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
     weatherCard.append(cardBody);
+  
+      var forecastDate = dayjs(date[i]).format('DD / MM / YY'); 
+      var dateEl = document.createElement('h4');
+      dateEl.innerHTML = forecastDate;
+   
+    var iconEl = document.createElement('i');
 
+    if (temp[i] > 20) {
+      iconEl.classList.add("fa-solid", "fa-sun");
+    }
+    else {
+      iconEl.classList.add("fa-solid", "fa-cloud");
+    }
+  
     var bodyContentEl = document.createElement('p');
     bodyContentEl.innerHTML =
       '<strong>Temp:</strong> ' + temp[i] + ' °C<br/>';
@@ -181,7 +245,7 @@ var displayForecast = function() {
       bodyContentEl.innerHTML +=
       '<strong>Humidity:</strong> ' + humidity[i] + ' %<br/>';
 
-      cardBody.append(bodyContentEl);
+      cardBody.append(dateEl, iconEl, bodyContentEl);
 
       forecastContent.append(weatherCard);
   }
@@ -189,3 +253,4 @@ var displayForecast = function() {
 
 userFormEl.addEventListener('submit', formSubmitHandler);
 historyButtonsEl.addEventListener('click', buttonClickHandler);
+saveHistory();
