@@ -15,3 +15,4 @@ Each City that is searched is also saved to the local storage and then presented
 **GitHub Page:** 
 https://emlarko.github.io/ELweather-dashboard/
 
+![Screenshot](assets/images/weather-screenshot.png?raw=true "Screenshot")
