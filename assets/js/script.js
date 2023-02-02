@@ -32,7 +32,7 @@ var formSubmitHandler = function (event) {
 
 
 var getLocation = function (city) {
-  var locationUrl = "http://api.openweathermap.org/geo/1.0/direct?q=" + city + "&appid=" + APIKey;
+  var locationUrl = "https://api.openweathermap.org/geo/1.0/direct?q=" + city + "&appid=" + APIKey;
   var location;
   var lat;
   var lon;
@@ -126,7 +126,7 @@ var getCurrentWeather = function (lat, lon) {
 var getWeather = function (lat, lon) {
   lat = localStorage.getItem('lat');
   lon = localStorage.getItem('lon');
-  var weatherUrl =  'http://api.openweathermap.org/data/2.5/forecast?lat=' + lat + '&lon=' + lon + "&units=metric&appid=" + APIKey;
+  var weatherUrl =  'https://api.openweathermap.org/data/2.5/forecast?lat=' + lat + '&lon=' + lon + "&units=metric&appid=" + APIKey;
  
   fetch(weatherUrl)
   .then(function (response) {
